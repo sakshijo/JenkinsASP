@@ -1,0 +1,141 @@
+echo %CC_VIEW_DIR%
+
+echo %CC_Launcher%
+
+net use z: /delete 2> NUL
+
+net use z: \\10.162.69.128\builds$ /user:vf-ie\ie-ccadm %IECCADM_PASSWORD%
+
+
+
+
+set projdir=%CC_UPDATE_DIR%
+
+set releaseDir=z:\Builds for Integration
+
+set buildNum=%BUILD_NUMBER%
+
+SET drop=%BUILD_NUMBER%
+
+SET drop=%drop:~1,2%
+
+set projectname=%PROJECT_NAME%
+
+set folder=%CC_Launcher%
+
+
+
+
+
+
+
+d:
+
+cd %projdir%
+
+
+
+
+setlocal ENABLEDELAYEDEXPANSION
+
+
+
+
+REM Set a string with an arbitrary number of substrings separated by semi colons
+
+set teststring=%Component_Path%
+
+REM Do something with each substring
+
+:stringLOOP
+
+    REM Stop when the string is empty
+
+    if "!teststring!" EQU "" goto END
+
+
+
+
+    for /f "delims=;" %%a in ("!teststring!") do set substring=%%a
+
+
+
+
+       echo !substring!
+
+
+
+
+For %%A in ("!substring!") do (
+
+    Set Fpath=%%~dpA
+
+    Set Name=%%~nxA
+
+
+
+
+)
+
+
+
+
+echo test ...............
+
+set str=%Fpath%
+
+set str1=!str:D:\view\ie-ccadm_build2\VF_IE_PROD\src\ASP-CEP-NET\Frontend\CEP_APP_SRV\=!
+
+
+
+
+echo %str1%
+
+
+
+
+xcopy %substring%  "%releaseDir%\DROP%drop%\%buildNum%\CEP_APP_SRV\%projectname%\wwwroot\%str1%"/Y /I
+
+
+
+
+echo !substring! >> "%releaseDir%\DROP%drop%\%buildNum%\CEP_APP_SRV\%projectname%\Component.txt"
+
+
+
+
+:striploop
+
+    set stripchar=!teststring:~0,1!
+
+    set teststring=!teststring:~1!
+
+
+
+
+     if "!teststring!" EQU "" goto stringloop
+
+
+
+
+    if "!stripchar!" NEQ ";" goto striploop
+
+
+
+
+    goto stringloop
+
+)
+
+    
+
+:END
+
+endlocal
+
+
+
+
+xcopy install_ASP.cmd "%releaseDir%\DROP%drop%\%buildNum%\CEP_APP_SRV\%projectname%\" /Y /I
+
+cd %folder%
